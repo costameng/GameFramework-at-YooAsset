@@ -172,6 +172,8 @@ public static class SettingsUtils
         return "Android";
 #elif UNITY_IOS
         return "IOS";
+#elif UNITY_WEBGL
+        return "WebGLPlayer";
 #else
         switch (Application.platform)
         {
@@ -189,6 +191,8 @@ public static class SettingsUtils
 
             case RuntimePlatform.Android:
                 return "Android";
+            case RuntimePlatform.WebGLPlayer:
+                return "WebGLPlayer";
             default:
                 throw new System.NotSupportedException(string.Format("Platform '{0}' is not supported.",
                     Application.platform.ToString()));
