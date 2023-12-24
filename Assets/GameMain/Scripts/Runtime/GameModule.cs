@@ -71,7 +71,7 @@ public class GameModule:AbsGameModuleMgr<GameModule>
     /// 获取网络组件。
     /// </summary>
     public static NetworkComponent Network { get; private set; }
-
+    
     /// <summary>
     /// 获取对象池组件。
     /// </summary>

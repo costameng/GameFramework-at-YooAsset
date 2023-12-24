@@ -28,7 +28,7 @@ public partial class GameApp:Singleton<GameApp>
     /// </summary>
     private void StartGameLogic()
     {
-        
+        GameLogic.Test.TestNetwork.Instance.OnEnter();
     }
 
     /// <summary>
@@ -87,6 +87,7 @@ public partial class GameApp:Singleton<GameApp>
             TProfiler.EndSample();
         }
         TProfiler.EndFirstSample();
+        GameLogic.Test.TestNetwork.Instance.OnUpdate();
     }
 
     private void FixedUpdate()
