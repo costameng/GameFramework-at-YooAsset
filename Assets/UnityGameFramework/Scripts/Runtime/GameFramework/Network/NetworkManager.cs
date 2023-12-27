@@ -233,22 +233,24 @@ namespace GameFramework.Network
             }
 
             NetworkChannelBase networkChannel = null;
+            // WebGL只支持Websocket
+            #if !UNITY_WEBGL
             switch (serviceType)
             {
-                // case ServiceType.Tcp:
-                //     networkChannel = new TcpNetworkChannel(name, networkChannelHelper);
-                //     break;
-                //
-                // case ServiceType.TcpWithSyncReceive:
-                //     networkChannel = new TcpWithSyncReceiveNetworkChannel(name, networkChannelHelper);
-                //     break;
                 case ServiceType.Tcp:
-                    networkChannel = new WebSocketNetworkChannel(name, networkChannelHelper);
+                    networkChannel = new TcpNetworkChannel(name, networkChannelHelper);
+                    break;
+                
+                case ServiceType.TcpWithSyncReceive:
+                    networkChannel = new TcpWithSyncReceiveNetworkChannel(name, networkChannelHelper);
                     break;
 
                 default:
                     throw new GameFrameworkException(Utility.Text.Format("Not supported service type '{0}'.", serviceType));
             }
+            #else
+            networkChannel = new WebSocketNetworkChannel(name, networkChannelHelper);
+            #endif
 
             networkChannel.NetworkChannelConnected += OnNetworkChannelConnected;
             networkChannel.NetworkChannelClosed += OnNetworkChannelClosed;
