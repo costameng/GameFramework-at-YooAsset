@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using GameFramework.Fsm;
 using GameFramework.Procedure;
+using UnityGameFramework.Runtime;
 
 namespace GameMain
 {
@@ -13,6 +14,14 @@ namespace GameMain
         {
             base.OnEnter(procedureOwner);
             StartGame().Forget();
+        }
+
+        protected override void OnUpdate(IFsm<IProcedureManager> procedureOwner, float elapseSeconds, float realElapseSeconds)
+        {
+            base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
+            
+            procedureOwner.SetData<VarString>("NextSceneName", "Welcome");
+            ChangeState<ProcedureChangeScene>(procedureOwner);
         }
 
         protected override void OnLeave(IFsm<IProcedureManager> procedureOwner, bool isShutdown)

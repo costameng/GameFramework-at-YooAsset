@@ -22,8 +22,8 @@ MonoBehaviour:
       m_ResAdminCode: 0
       m_ServerType: 2
       m_CleanCommitPathRes: 1
-      m_InnerResourceSourceUrl: http://127.0.0.1:8088
-      m_ExtraResourceSourceUrl: http://120.48.40.228:8088
+      m_InnerResourceSourceUrl: http://192.168.40.143:14016
+      m_ExtraResourceSourceUrl: http://192.168.40.60:8081
       m_FormalResourceSourceUrl: http://127.0.0.1:8088
     m_AtlasFolder: Assets/GameMain/AssetsHotfix/UI/UIArt/Atlas
     m_ResourceVersionFileName: ResourceVersion.txt
@@ -40,8 +40,8 @@ MonoBehaviour:
     m_Enable: 1
     m_Gitee: 1
     HotUpdateAssemblies:
-    - GameBase.dll
     - GameProto.dll
+    - GameBase.dll
     - BattleCore.Runtime.dll
     - GameLogic.dll
     AOTMetaAssemblies:

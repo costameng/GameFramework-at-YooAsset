@@ -235,12 +235,15 @@ namespace GameFramework.Network
             NetworkChannelBase networkChannel = null;
             switch (serviceType)
             {
+                // case ServiceType.Tcp:
+                //     networkChannel = new TcpNetworkChannel(name, networkChannelHelper);
+                //     break;
+                //
+                // case ServiceType.TcpWithSyncReceive:
+                //     networkChannel = new TcpWithSyncReceiveNetworkChannel(name, networkChannelHelper);
+                //     break;
                 case ServiceType.Tcp:
-                    networkChannel = new TcpNetworkChannel(name, networkChannelHelper);
-                    break;
-
-                case ServiceType.TcpWithSyncReceive:
-                    networkChannel = new TcpWithSyncReceiveNetworkChannel(name, networkChannelHelper);
+                    networkChannel = new WebSocketNetworkChannel(name, networkChannelHelper);
                     break;
 
                 default:

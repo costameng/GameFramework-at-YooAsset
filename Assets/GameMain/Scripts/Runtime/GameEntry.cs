@@ -13,5 +13,6 @@ public partial class GameEntry : MonoBehaviour
     private void Start()
     {
         GameModule.Instance.Active();
+        InitBuiltinComponents();
     }
 }

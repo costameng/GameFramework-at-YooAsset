@@ -28,7 +28,9 @@ public partial class GameApp:Singleton<GameApp>
     /// </summary>
     private void StartGameLogic()
     {
-        
+        // UnityGameFramework.Runtime.GameEntry.GetComponent<SceneComponent>().LoadScene("Welcome");
+        UnityGameFramework.Runtime.GameEntry.GetComponent<UIComponent>().OpenUIForm("TestUIForm", "UI");
+        GameLogic.Test.TestNetwork.Instance.OnEnter();
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using System.Net.Sockets;
+using UnityWebSocket;
 
 namespace GameFramework.Network
 {
@@ -16,14 +16,21 @@ namespace GameFramework.Network
         {
             get;
         }
-
+        
         /// <summary>
         /// 获取网络频道所使用的 Socket。
         /// </summary>
+#if !UNITY_WEBGL
         Socket Socket
         {
             get;
         }
+#else
+        WebSocket Socket
+        {
+            get;
+        }
+#endif
 
         /// <summary>
         /// 获取是否已连接。

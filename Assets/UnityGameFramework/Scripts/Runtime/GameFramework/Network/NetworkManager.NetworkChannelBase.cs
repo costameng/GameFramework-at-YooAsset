@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using UnityWebSocket;
+using System.Threading;
 
 namespace GameFramework.Network
 {
@@ -21,7 +23,11 @@ namespace GameFramework.Network
             protected AddressFamily m_AddressFamily;
             protected bool m_ResetHeartBeatElapseSecondsWhenReceivePacket;
             protected float m_HeartBeatInterval;
+#if !UNITY_WEBGL
             protected Socket m_Socket;
+#else
+            protected WebSocket m_Socket;
+#endif
             protected readonly SendState m_SendState;
             protected readonly ReceiveState m_ReceiveState;
             protected readonly HeartBeatState m_HeartBeatState;
@@ -82,6 +88,7 @@ namespace GameFramework.Network
             /// <summary>
             /// 获取网络频道所使用的 Socket。
             /// </summary>
+#if !UNITY_WEBGL
             public Socket Socket
             {
                 get
@@ -89,6 +96,15 @@ namespace GameFramework.Network
                     return m_Socket;
                 }
             }
+#else
+            public WebSocket Socket
+            {
+                get
+                {
+                    return m_Socket;
+                }
+            }
+#endif
 
             /// <summary>
             /// 获取是否已连接。
@@ -99,7 +115,11 @@ namespace GameFramework.Network
                 {
                     if (m_Socket != null)
                     {
+#if !UNITY_WEBGL
                         return m_Socket.Connected;
+#else
+                        return m_Socket.ReadyState == WebSocketState.Open;
+#endif
                     }
 
                     return false;
@@ -371,14 +391,20 @@ namespace GameFramework.Network
 
                     try
                     {
+                        #if !UNITY_WEBGL
                         m_Socket.Shutdown(SocketShutdown.Both);
+                        #else
+                        m_Socket.CloseAsync();
+                        #endif
                     }
                     catch
                     {
                     }
                     finally
                     {
+                        #if !UNITY_WEBGL
                         m_Socket.Close();
+                        #endif
                         m_Socket = null;
 
                         if (NetworkChannelClosed != null)

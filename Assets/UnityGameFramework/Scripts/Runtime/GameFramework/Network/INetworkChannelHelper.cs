@@ -62,5 +62,13 @@ namespace GameFramework.Network
         /// <param name="customErrorData">用户自定义错误数据。</param>
         /// <returns>反序列化后的消息包。</returns>
         Packet DeserializePacket(IPacketHeader packetHeader, Stream source, out object customErrorData);
+        
+        /// <summary>
+        /// 反序列化protobuff数据
+        /// </summary>
+        /// <param name="protoId">协议ID</param>
+        /// <param name="protoBody">.proto文件里边定义的message结构体</param>
+        /// <returns></returns>
+        Packet DeserializeProto(int protoId, byte[] protoBody);
     }
 }

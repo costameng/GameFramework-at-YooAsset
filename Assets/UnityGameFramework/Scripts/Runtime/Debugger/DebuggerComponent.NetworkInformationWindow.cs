@@ -42,8 +42,10 @@ namespace UnityGameFramework.Runtime
                 {
                     DrawItem("Service Type", networkChannel.ServiceType.ToString());
                     DrawItem("Address Family", networkChannel.AddressFamily.ToString());
+                    #if !UNITY_WEBGL
                     DrawItem("Local Address", networkChannel.Connected ? networkChannel.Socket.LocalEndPoint.ToString() : "Unavailable");
                     DrawItem("Remote Address", networkChannel.Connected ? networkChannel.Socket.RemoteEndPoint.ToString() : "Unavailable");
+                    #endif
                     DrawItem("Send Packet", Utility.Text.Format("{0} / {1}", networkChannel.SendPacketCount, networkChannel.SentPacketCount));
                     DrawItem("Receive Packet", Utility.Text.Format("{0} / {1}", networkChannel.ReceivePacketCount, networkChannel.ReceivedPacketCount));
                     DrawItem("Miss Heart Beat Count", networkChannel.MissHeartBeatCount.ToString());
