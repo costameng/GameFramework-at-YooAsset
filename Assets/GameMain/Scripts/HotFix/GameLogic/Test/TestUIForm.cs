@@ -12,12 +12,27 @@ namespace GameLogic.Test
         
             Log.Info("TestUIForm Open");
         }
-
-        public void OnLoginButtonClick()
+        
+        public void OnConnectButtonClick()
         {
-            Log.Info("Test Login");
+            Log.Info("Test Connect");
+            // TestNetworkMgr.Instance.SendLogin();
+            TestNetwork.Instance.OnEnter();
+        }
+        
+        public void OnDisconnetButtonClick()
+        {
+            Log.Info("Test Disconnect");
+            // TestNetworkMgr.Instance.SendLogin();
+            // TestNetwork.Instance.OnEnter();
+        }
+        
+        public void OnHeartBeatButtonClick()
+        {
+            Log.Info("Test HeartBeat");
             // TestNetworkMgr.Instance.SendLogin();
             NetworkMgr.Instance.SendHeartBeat();
         }
+        
     }
 }
