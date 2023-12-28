@@ -1,47 +1,114 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 using YooAsset;
 
 namespace GameFramework.Resource
 {
     internal partial class ResourceManager
     {
+        
         /// <summary>
-        /// 资源文件解密服务类。
+        /// 资源文件流加载解密类
         /// </summary>
-        private class GameDecryptionServices : IDecryptionServices
+        private class FileStreamDecryption : IDecryptionServices
         {
-            public ulong LoadFromFileOffset(DecryptFileInfo fileInfo)
+            /// <summary>
+            /// 同步方式获取解密的资源包对象
+            /// 注意：加载流对象在资源包对象释放的时候会自动释放
+            /// </summary>
+            AssetBundle IDecryptionServices.LoadAssetBundle(DecryptFileInfo fileInfo, out Stream managedStream)
             {
-                return 32;
+                BundleStream bundleStream = new BundleStream(fileInfo.FileLoadPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
+                managedStream = bundleStream;
+                return AssetBundle.LoadFromStream(bundleStream, fileInfo.ConentCRC, GetManagedReadBufferSize());
             }
-
-            public byte[] LoadFromMemory(DecryptFileInfo fileInfo)
+    
+            /// <summary>
+            /// 异步方式获取解密的资源包对象
+            /// 注意：加载流对象在资源包对象释放的时候会自动释放
+            /// </summary>
+            AssetBundleCreateRequest IDecryptionServices.LoadAssetBundleAsync(DecryptFileInfo fileInfo, out Stream managedStream)
             {
-                throw new NotImplementedException();
+                BundleStream bundleStream = new BundleStream(fileInfo.FileLoadPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
+                managedStream = bundleStream;
+                return AssetBundle.LoadFromStreamAsync(bundleStream, fileInfo.ConentCRC, GetManagedReadBufferSize());
             }
-
-            public Stream LoadFromStream(DecryptFileInfo fileInfo)
-            {
-                BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
-                return bundleStream;
-            }
-
-            public uint GetManagedReadBufferSize()
+    
+            private static uint GetManagedReadBufferSize()
             {
                 return 1024;
             }
         }
-
+    
         /// <summary>
-        /// 内置文件查询服务类。
+        /// 资源文件偏移加载解密类
         /// </summary>
-        private class GameQueryServices : IQueryServices
+        private class FileOffsetDecryption : IDecryptionServices
         {
-            public bool QueryStreamingAssets(string fileName)
+            /// <summary>
+            /// 同步方式获取解密的资源包对象
+            /// 注意：加载流对象在资源包对象释放的时候会自动释放
+            /// </summary>
+            AssetBundle IDecryptionServices.LoadAssetBundle(DecryptFileInfo fileInfo, out Stream managedStream)
             {
-                string builtinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
-                return StreamingAssetsHelper.FileExists($"{builtinFolderName}/{fileName}");
+                managedStream = null;
+                return AssetBundle.LoadFromFile(fileInfo.FileLoadPath, fileInfo.ConentCRC, GetFileOffset());
+            }
+    
+            /// <summary>
+            /// 异步方式获取解密的资源包对象
+            /// 注意：加载流对象在资源包对象释放的时候会自动释放
+            /// </summary>
+            AssetBundleCreateRequest IDecryptionServices.LoadAssetBundleAsync(DecryptFileInfo fileInfo, out Stream managedStream)
+            {
+                managedStream = null;
+                return AssetBundle.LoadFromFileAsync(fileInfo.FileLoadPath, fileInfo.ConentCRC, GetFileOffset());
+            }
+    
+            private static ulong GetFileOffset()
+            {
+                return 32;
+            }
+        }
+    
+        /// <summary>
+        /// 资源文件查询服务类
+        /// </summary>
+        public class GameQueryServices : IBuildinQueryServices
+        {
+            /// <summary>
+            /// 查询内置文件的时候，是否比对文件哈希值
+            /// </summary>
+            public static bool CompareFileCRC = false;
+        
+            public bool Query(string packageName, string fileName, string fileCRC)
+            {
+                // 注意：fileName包含文件格式
+                return StreamingAssetsHelper.FileExists(packageName, fileName, fileCRC);
+            }
+        }
+        
+        /// <summary>
+        /// 远端资源地址查询服务类
+        /// </summary>
+        private class RemoteServices : IRemoteServices
+        {
+            private readonly string _defaultHostServer;
+            private readonly string _fallbackHostServer;
+    
+            public RemoteServices(string defaultHostServer, string fallbackHostServer)
+            {
+                _defaultHostServer = defaultHostServer;
+                _fallbackHostServer = fallbackHostServer;
+            }
+            string IRemoteServices.GetRemoteMainURL(string fileName)
+            {
+                return $"{_defaultHostServer}/{fileName}";
+            }
+            string IRemoteServices.GetRemoteFallbackURL(string fileName)
+            {
+                return $"{_fallbackHostServer}/{fileName}";
             }
         }
     }

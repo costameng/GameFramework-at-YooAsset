@@ -52,6 +52,15 @@ namespace GameMain
                     Log.Info("Updatable resource mode detected.");
                     ChangeState<ProcedureUpdateVersion>(procedureOwner);
                 }
+                // 可更新模式。
+                else if (GameModule.Resource.PlayMode == EPlayMode.WebPlayMode)
+                {
+                    // 打开启动UI。
+                    UILoadMgr.Show(UIDefine.UILoadUpdate);
+
+                    Log.Info("Updatable resource mode detected.");
+                    ChangeState<ProcedureUpdateVersion>(procedureOwner);
+                }
                 else
                 {
                     Log.Error("UnKnow resource mode detected Please check???");

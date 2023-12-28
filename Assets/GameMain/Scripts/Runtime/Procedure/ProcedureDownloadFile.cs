@@ -52,26 +52,25 @@ namespace GameMain
             string currentSizeMb = (currentDownloadBytes / 1048576f).ToString("f1");
             string totalSizeMb = (totalDownloadBytes / 1048576f).ToString("f1");
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"{currentDownloadCount}/{totalDownloadCount} {currentSizeMb}MB/{totalSizeMb}MB");
-            string descriptionText = Utility.Text.Format("正在更新，已更新{0}，总更新{1}，已更新大小{2}，总更新大小{3}，更新进度{4}，当前网速{5}/s", 
+            string descriptionText = Utility.Text.Format("正在更新，已更新{0}，总更新{1}，已更新大小{2}，总更新大小{3}，更新进度{4}", 
                 currentDownloadCount.ToString(), 
                 totalDownloadCount.ToString(), 
                 Utility.File.GetByteLengthString(currentDownloadBytes), 
                 Utility.File.GetByteLengthString(totalDownloadBytes), 
-                GameModule.Resource.Downloader.Progress, 
-                Utility.File.GetByteLengthString((int)GameModule.Resource.Downloader.CurrentSpeed));
+                GameModule.Resource.Downloader.Progress);
             LoadUpdateLogic.Instance.DownProgressAction?.Invoke(GameModule.Resource.Downloader.Progress);
             UILoadMgr.Show(UIDefine.UILoadUpdate,descriptionText);
 
-            int needTime = 0;
-            if (GameModule.Resource.Downloader.CurrentSpeed > 0)
-            {
-                needTime = (int)((totalDownloadBytes - currentDownloadBytes) / GameModule.Resource.Downloader.CurrentSpeed);
-            }
-            
-            TimeSpan ts = new TimeSpan(0, 0, needTime);
-            string timeStr = ts.ToString(@"mm\:ss");
-            string updateProgress = Utility.Text.Format("剩余时间 {0}({1}/s)", timeStr, Utility.File.GetLengthString((int)GameModule.Resource.Downloader.CurrentSpeed));
-            Log.Info(updateProgress);
+            // int needTime = 0;
+            // if (GameModule.Resource.Downloader.CurrentSpeed > 0)
+            // {
+            //     needTime = (int)((totalDownloadBytes - currentDownloadBytes) / GameModule.Resource.Downloader.CurrentSpeed);
+            // }
+            //
+            // TimeSpan ts = new TimeSpan(0, 0, needTime);
+            // string timeStr = ts.ToString(@"mm\:ss");
+            // string updateProgress = Utility.Text.Format("剩余时间 {0}({1}/s)", timeStr, Utility.File.GetLengthString((int)GameModule.Resource.Downloader.CurrentSpeed));
+            // Log.Info(updateProgress);
         }
     }
 }

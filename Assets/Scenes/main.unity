@@ -238,13 +238,17 @@ PrefabInstance:
       propertyPath: m_AvailableProcedureTypeNames.Array.data[13]
       value: GameMain.ProcedureUpdateVersion
       objectReference: {fileID: 0}
+    - target: {fileID: 11499388, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
+      propertyPath: m_VersionHelperTypeName
+      value: UnityGameFramework.Runtime.DefaultVersionHelper
+      objectReference: {fileID: 0}
     - target: {fileID: 300223661, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
       propertyPath: m_ClearFlags
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4861881215341461167, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
       propertyPath: PlayMode
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}

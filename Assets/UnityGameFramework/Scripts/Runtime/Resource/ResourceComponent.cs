@@ -287,7 +287,7 @@ namespace UnityGameFramework.Runtime
                 return default;
             }
 
-            AssetOperationHandle operationHandle = m_ResourceManager.LoadAssetAsync<T>(assetName);
+            AssetHandle operationHandle = m_ResourceManager.LoadAssetAsync<T>(assetName);
 
             await operationHandle.ToUniTask(this);
 
@@ -309,7 +309,7 @@ namespace UnityGameFramework.Runtime
                 return default;
             }
 
-            AssetOperationHandle operationHandle = m_ResourceManager.LoadAssetAsync<T>(assetName);
+            AssetHandle operationHandle = m_ResourceManager.LoadAssetAsync<T>(assetName);
 
             await operationHandle.ToUniTask(cancellationToken:cancellationToken).SuppressCancellationThrow();
 
@@ -369,10 +369,10 @@ namespace UnityGameFramework.Runtime
             return package.UpdatePackageVersionAsync(appendTimeTicks,timeout);
         }
 
-        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60)
+        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
         {
             var package = YooAssets.GetPackage(PackageName);
-            return package.UpdatePackageManifestAsync(packageVersion,timeout);
+            return package.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
         }
         
         /// <summary>

@@ -172,7 +172,7 @@ namespace GameFramework.Resource
         /// <param name="assetName">要加载资源的名称。</param>
         /// <typeparam name="T">要加载资源的类型。</typeparam>
         /// <returns>同步加载资源句柄。</returns>
-        AssetOperationHandle LoadAssetAsync<T>(string assetName) where T : UnityEngine.Object;
+        AssetHandle LoadAssetAsync<T>(string assetName) where T : UnityEngine.Object;
         
         /// <summary>
         /// 同步加载资源并获取句柄。
@@ -180,7 +180,7 @@ namespace GameFramework.Resource
         /// <param name="assetName">要加载资源的名称。</param>
         /// <typeparam name="T">要加载资源的类型。</typeparam>
         /// <returns>同步加载资源句柄。</returns>
-        AssetOperationHandle LoadAssetGetOperation<T>(string assetName) where T : UnityEngine.Object;
+        AssetHandle LoadAssetGetOperation<T>(string assetName) where T : UnityEngine.Object;
         
         /// <summary>
         /// 异步加载资源。

@@ -24,7 +24,9 @@ namespace GameMain
         /// <summary>
         /// 是否需要加载热更新DLL
         /// </summary>
-        public bool NeedLoadDll => GameModule.Resource.PlayMode == EPlayMode.HostPlayMode || GameModule.Resource.PlayMode == EPlayMode.OfflinePlayMode;
+        public bool NeedLoadDll => GameModule.Resource.PlayMode == EPlayMode.HostPlayMode 
+                                   || GameModule.Resource.PlayMode == EPlayMode.WebPlayMode
+                                   || GameModule.Resource.PlayMode == EPlayMode.OfflinePlayMode;
 
         private bool m_enableAddressable = true;
 

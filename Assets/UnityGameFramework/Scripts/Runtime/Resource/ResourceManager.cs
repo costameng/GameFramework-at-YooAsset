@@ -135,9 +135,9 @@ namespace GameFramework.Resource
         public void Initialize()
         {
             // 初始化资源系统
-            YooAssets.Initialize(new YooAssetsLogger(), InstanceRoot);
+            YooAssets.Initialize(new YooAssetsLogger());
             YooAssets.SetOperationSystemMaxTimeSlice(Milliseconds);
-            YooAssets.SetCacheSystemCachedFileVerifyLevel(VerifyLevel);
+            // YooAssets.SetCacheSystemCachedFileVerifyLevel(VerifyLevel);
 
             // 创建默认的资源包
             string packageName = PackageName;
@@ -199,7 +199,7 @@ namespace GameFramework.Resource
             if (PlayMode == EPlayMode.EditorSimulateMode)
             {
                 var createParameters = new EditorSimulateModeParameters();
-                createParameters.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(packageName);
+                createParameters.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild("BuiltinBuildPipeline", packageName);
                 initializationOperation = package.InitializeAsync(createParameters);
             }
 
@@ -207,7 +207,7 @@ namespace GameFramework.Resource
             if (PlayMode == EPlayMode.OfflinePlayMode)
             {
                 var createParameters = new OfflinePlayModeParameters();
-                createParameters.DecryptionServices = new GameDecryptionServices();
+                createParameters.DecryptionServices = new FileStreamDecryption();
                 initializationOperation = package.InitializeAsync(createParameters);
             }
 
@@ -215,10 +215,20 @@ namespace GameFramework.Resource
             if (PlayMode == EPlayMode.HostPlayMode)
             {
                 var createParameters = new HostPlayModeParameters();
-                createParameters.DecryptionServices = new GameDecryptionServices();
-                createParameters.QueryServices = new GameQueryServices();
-                createParameters.DefaultHostServer = HostServerURL;
-                createParameters.FallbackHostServer = HostServerURL;
+                createParameters.DecryptionServices = new FileStreamDecryption();
+                createParameters.BuildinQueryServices = new GameQueryServices();
+                // createParameters.DeliveryQueryServices = new DefaultDeliveryQueryServices();
+                createParameters.RemoteServices = new RemoteServices(HostServerURL, HostServerURL);
+                initializationOperation = package.InitializeAsync(createParameters);
+            }
+            
+            // Web Play Mode
+            if (PlayMode == EPlayMode.WebPlayMode)
+            {
+                var createParameters = new WebPlayModeParameters();
+                createParameters.DecryptionServices = null;
+                createParameters.BuildinQueryServices = new GameQueryServices();
+                createParameters.RemoteServices = new RemoteServices(HostServerURL, HostServerURL);
                 initializationOperation = package.InitializeAsync(createParameters);
             }
 
@@ -227,8 +237,8 @@ namespace GameFramework.Resource
 
         internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
-            DebugCheckDuplicateDriver();
-            YooAssets.Update();
+            // DebugCheckDuplicateDriver();
+            // YooAssets.Update();
         }
 
         internal override void Shutdown()
@@ -236,17 +246,17 @@ namespace GameFramework.Resource
             YooAssets.Destroy();
         }
 
-        [Conditional("DEBUG")]
-        private void DebugCheckDuplicateDriver()
-        {
-            if (_lastUpdateFrame > 0)
-            {
-                if (_lastUpdateFrame == Time.frameCount)
-                    YooLogger.Warning($"There are two {nameof(YooAssetsDriver)} in the scene. Please ensure there is always exactly one driver in the scene.");
-            }
-
-            _lastUpdateFrame = Time.frameCount;
-        }
+        // [Conditional("DEBUG")]
+        // private void DebugCheckDuplicateDriver()
+        // {
+        //     if (_lastUpdateFrame > 0)
+        //     {
+        //         if (_lastUpdateFrame == Time.frameCount)
+        //             YooLogger.Warning($"There are two {nameof(YooAssetsDriver)} in the scene. Please ensure there is always exactly one driver in the scene.");
+        //     }
+        //
+        //     _lastUpdateFrame = Time.frameCount;
+        // }
 
         #region Public Methods
 
@@ -325,7 +335,7 @@ namespace GameFramework.Resource
         /// 同步加载资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public AssetOperationHandle LoadAssetSync(AssetInfo assetInfo)
+        public AssetHandle LoadAssetSync(AssetInfo assetInfo)
         {
             return YooAssets.LoadAssetSync(assetInfo);
         }
@@ -335,7 +345,7 @@ namespace GameFramework.Resource
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : UnityEngine.Object
+        public AssetHandle LoadAssetSync<TObject>(string location) where TObject : UnityEngine.Object
         {
             return YooAssets.LoadAssetSync<TObject>(location);
         }
@@ -345,7 +355,7 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public AssetOperationHandle LoadAssetSync(string location, System.Type type)
+        public AssetHandle LoadAssetSync(string location, System.Type type)
         {
             return YooAssets.LoadAssetSync(location, type);
         }
@@ -355,7 +365,7 @@ namespace GameFramework.Resource
         /// 异步加载资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo)
+        public AssetHandle LoadAssetAsync(AssetInfo assetInfo)
         {
             return YooAssets.LoadAssetAsync(assetInfo);
         }
@@ -365,7 +375,7 @@ namespace GameFramework.Resource
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public AssetOperationHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
+        public AssetHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
         {
             return YooAssets.LoadAssetAsync<TObject>(location);
         }
@@ -375,7 +385,7 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public AssetOperationHandle LoadAssetAsync(string location, System.Type type)
+        public AssetHandle LoadAssetAsync(string location, System.Type type)
         {
             return YooAssets.LoadAssetAsync(location, type);
         }
@@ -386,7 +396,7 @@ namespace GameFramework.Resource
         /// <param name="location">要加载资源的名称。</param>
         /// <typeparam name="T">要加载资源的类型。</typeparam>
         /// <returns>同步加载资源句柄。</returns>
-        public AssetOperationHandle LoadAssetGetOperation<T>(string location) where T : UnityEngine.Object
+        public AssetHandle LoadAssetGetOperation<T>(string location) where T : UnityEngine.Object
         {
             var handle = LoadAssetSync<T>(location);
 
@@ -490,14 +500,12 @@ namespace GameFramework.Resource
 
                 throw new GameFrameworkException(errorMessage);
             }
-
-            OperationHandleBase handleBase;
-
-            handleBase = assetPackage.LoadAssetAsync(assetName, assetType);
+            
+            HandleBase handleBase = assetPackage.LoadAssetAsync(assetName, assetType);
             
             await handleBase.ToUniTask(ResourceHelper);
 
-            AssetOperationHandle handle = (AssetOperationHandle)handleBase;
+            AssetHandle handle = (AssetHandle)handleBase;
             if (handle == null || handle.AssetObject == null || handle.Status == EOperationStatus.Failed)
             {
                 string errorMessage = Utility.Text.Format("Can not load asset '{0}'.", assetName);
@@ -557,14 +565,12 @@ namespace GameFramework.Resource
 
                 throw new GameFrameworkException(errorMessage);
             }
-
-            OperationHandleBase handleBase;
-
-            handleBase = assetPackage.LoadAssetAsync(assetInfo);
+            
+            HandleBase handleBase = assetPackage.LoadAssetAsync(assetInfo);
             
             await handleBase.ToUniTask(ResourceHelper);
 
-            AssetOperationHandle handle = (AssetOperationHandle)handleBase;
+            AssetHandle handle = (AssetHandle)handleBase;
             if (handle == null || handle.AssetObject == null || handle.Status == EOperationStatus.Failed)
             {
                 string errorMessage = Utility.Text.Format("Can not load asset '{0}'.", assetName);
@@ -590,12 +596,20 @@ namespace GameFramework.Resource
         
         public void UnloadUnusedAssets()
         {
-            YooAssets.UnloadUnusedAssets();
+            var package = YooAssets.TryGetPackage(PackageName);
+            if (package != null)
+            {
+                package.UnloadUnusedAssets();
+            }
         }
         
         public void ForceUnloadAllAssets()
         {
-            YooAssets.ForceUnloadAllAssets();
+            var package = YooAssets.TryGetPackage(PackageName);
+            if (package != null)
+            {
+                package.ForceUnloadAllAssets();
+            }
         }
         
         public void UnloadAsset(object asset)
@@ -658,8 +672,7 @@ namespace GameFramework.Resource
             }
             
             float duration = Time.time;
-
-            SceneOperationHandle handle = YooAssets.LoadSceneAsync(sceneAssetName,LoadSceneMode.Single,activateOnLoad:true,priority:priority);
+            SceneHandle handle = YooAssets.LoadSceneAsync(location:sceneAssetName, sceneMode:LoadSceneMode.Single, suspendLoad:false, (uint)priority);
 
             await handle.ToUniTask(ResourceHelper);
             

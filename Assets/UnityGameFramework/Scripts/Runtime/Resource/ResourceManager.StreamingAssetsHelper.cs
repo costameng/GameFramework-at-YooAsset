@@ -1,85 +1,100 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityGameFramework.Runtime;
+using YooAsset;
 
 namespace GameFramework.Resource
 {
     internal partial class ResourceManager
     {
+        #if UNITY_EDITOR
         public sealed class StreamingAssetsHelper
         {
-            private static readonly Dictionary<string, bool> _cacheData = new Dictionary<string, bool>(1000);
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-            private static AndroidJavaClass _unityPlayerClass;
-
-            public static AndroidJavaClass UnityPlayerClass
+            public static void Init() { }
+            public static bool FileExists(string packageName, string fileName, string fileCRC)
             {
-                get
+                string filePath = Path.Combine(Application.streamingAssetsPath, StreamingAssetsDefine.RootFolderName, packageName, fileName);
+                if (File.Exists(filePath))
                 {
-                    if (_unityPlayerClass == null)
-                        _unityPlayerClass = new UnityEngine.AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    return _unityPlayerClass;
+                    if (GameQueryServices.CompareFileCRC)
+                    {
+                        
+                        string crc32 = YooAsset.HashUtility.FileCRC32(filePath);
+                        return crc32 == fileCRC;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
-
-            private static AndroidJavaObject _currentActivity;
-
-            public static AndroidJavaObject CurrentActivity
-            {
-                get
-                {
-                    if (_currentActivity == null)
-                        _currentActivity = UnityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-                    return _currentActivity;
-                }
-            }
-            
-            private static AndroidJavaObject _assetManager;
-
-            public static AndroidJavaObject AssetManager
-            {
-                get
-                {
-                    if (_assetManager == null)
-                        _assetManager = CurrentActivity.Call<AndroidJavaObject>("GetAssets");;
-                    return _assetManager;
-                }
-            }
-            
-            /// <summary>
-            /// 利用安卓原生接口查询内置文件是否存在
-            /// </summary>
-            public static bool FileExists(string filePath)
-            {
-                if (_cacheData.TryGetValue(filePath, out bool result) == false)
-                {
-                    result = CurrentActivity.Call<bool>("CheckAssetExist", filePath);
-                    _cacheData.Add(filePath, result);
-                }
-
-                Log.Warning($"FileExists ? :{filePath} result:{result}");
-
-                return result;
-            }
-#else
-            public static bool FileExists(string filePath)
-            {
-                string path = string.Empty;
-
-                if (_cacheData.TryGetValue(filePath, out bool result) == false)
-                {
-                    path = System.IO.Path.Combine(Application.streamingAssetsPath, filePath);
-                    result = System.IO.File.Exists(path);
-                    _cacheData.Add(filePath, result);
-                }
-                
-                Log.Warning($"FileExists ? :{path} result:{result}");
-
-                return result;
-            }
-#endif
         }
+        #else
+        public sealed class StreamingAssetsHelper
+        {
+            private class PackageQuery
+            {
+                public readonly Dictionary<string, BuildinFileManifest.Element> Elements = new Dictionary<string, BuildinFileManifest.Element>(1000);
+            }
+        
+            private static bool _isInit = false;
+            private static readonly Dictionary<string, PackageQuery> _packages = new Dictionary<string, PackageQuery>(10);
+        
+            /// <summary>
+            /// 初始化
+            /// </summary>
+            public static void Init()
+            {
+                if (_isInit == false)
+                {
+                    _isInit = true;
+        
+                    var manifest = Resources.Load<BuildinFileManifest>("BuildinFileManifest");
+                    if (manifest != null)
+                    {
+                        foreach (var element in manifest.BuildinFiles)
+                        {
+                            if (_packages.TryGetValue(element.PackageName, out PackageQuery package) == false)
+                            {
+                                package = new PackageQuery();
+                                _packages.Add(element.PackageName, package);
+                            }
+                            package.Elements.Add(element.FileName, element);
+                        }
+                    }
+                }
+            }
+        
+            /// <summary>
+            /// 内置文件查询方法
+            /// </summary>
+            public static bool FileExists(string packageName, string fileName, string fileCRC32)
+            {
+                if (_isInit == false)
+                    Init();
+        
+                if (_packages.TryGetValue(packageName, out PackageQuery package) == false)
+                    return false;
+        
+                if (package.Elements.TryGetValue(fileName, out var element) == false)
+                    return false;
+        
+                if (GameQueryServices.CompareFileCRC)
+                {
+                    return element.FileCRC32 == fileCRC32;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        #endif
     }
 }
 
